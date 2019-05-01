@@ -1,6 +1,7 @@
 package apsprojchat;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -37,16 +38,18 @@ private JTextField txtNome;
     public Cliente() throws IOException{     
     // Interface
     JLabel lblMessage = new JLabel("Verificar!");
-    txtIP = new JTextField("192.168.0.7"); // IP padrão
-    txtPorta = new JTextField("12345"); // porta padrão
-    txtNome = new JTextField("Cliente"); // nickname cliente padrão              
+    txtIP = new JTextField("192.168.0.7"); // <--- IP padrão
+    txtPorta = new JTextField("12345"); // <--- porta padrão
+    txtNome = new JTextField("Cliente-Servidor"); // <--- nickname cliente padrão              
     Object[] texts = {lblMessage, txtIP, txtPorta, txtNome };  
     JOptionPane.showMessageDialog(null, texts);              
     pnlContent = new JPanel();
-    texto = new JTextArea(10,20);
+    texto = new JTextArea(11,53); // altura/largura txtArea Histórico
+    texto.setFont(new Font("Dialog",Font.BOLD,14)); // Tamanho da fonte na txtArea
     texto.setEditable(false);
     texto.setBackground(new Color(240,240,240));
-    MsgTxt = new JTextField(20);
+    MsgTxt = new JTextField(53); // largura txtField Mensagem
+    MsgTxt.setFont(new Font("Dialog",Font.BOLD,15)); // Tamanho da fonte no txtField
     lblHistorico = new JLabel("Histórico");
     lblMsg = new JLabel("Mensagem");
     btnSend = new JButton("Enviar");
@@ -72,7 +75,7 @@ private JTextField txtNome;
     setContentPane(pnlContent);
     setLocationRelativeTo(null);
     setResizable(false);
-    setSize(250,300);
+    setSize(700,370); // largura/altura janela
     setVisible(true);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     // Interface
