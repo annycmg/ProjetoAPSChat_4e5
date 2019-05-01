@@ -21,14 +21,14 @@ import static javax.swing.JFrame.EXIT_ON_CLOSE;
 public class Cliente extends JFrame implements ActionListener, KeyListener{
 private static final long serialVersionUID = 1L;
 private JTextArea texto;
-private JTextField MsgTxt;
-private JButton btnSend;
-private JButton btnSair;
+private JTextField mensagem;
+private JButton btEnviar;
+private JButton btSair;
 private JLabel lblHistorico;
-private JLabel lblMsg;
-private JPanel pnlContent;
+private JLabel lblMensagem;
+private JPanel pnlConteudo;
 private Socket socket;
-private OutputStream out ;
+private OutputStream out;
 private Writer writer; 
 private BufferedWriter bfwriter;
 private JTextField txtIP;
@@ -43,130 +43,119 @@ private JTextField txtNome;
     txtNome = new JTextField("Cliente-Servidor"); // <--- nickname cliente padrão              
     Object[] texts = {lblMessage, txtIP, txtPorta, txtNome };  
     JOptionPane.showMessageDialog(null, texts);              
-    pnlContent = new JPanel();
+    pnlConteudo = new JPanel();
     texto = new JTextArea(11,53); // altura/largura txtArea Histórico
     texto.setFont(new Font("Dialog",Font.BOLD,14)); // Tamanho da fonte na txtArea
     texto.setEditable(false);
     texto.setBackground(new Color(240,240,240));
-    MsgTxt = new JTextField(53); // largura txtField Mensagem
-    MsgTxt.setFont(new Font("Dialog",Font.BOLD,15)); // Tamanho da fonte no txtField
+    mensagem = new JTextField(53); // largura txtField Mensagem
+    mensagem.setFont(new Font("Dialog",Font.BOLD,15)); // Tamanho da fonte no txtField
     lblHistorico = new JLabel("Histórico");
-    lblMsg = new JLabel("Mensagem");
-    btnSend = new JButton("Enviar");
-    btnSend.setToolTipText("Enviar Mensagem");
-    btnSair = new JButton("Sair");
-    btnSair.setToolTipText("Sair do Chat");
-    btnSend.addActionListener(this);
-    btnSair.addActionListener(this);
-    btnSend.addKeyListener(this);
-    MsgTxt.addKeyListener(this);
+    lblMensagem = new JLabel("Mensagem");
+    btEnviar = new JButton("Enviar");
+    btEnviar.setToolTipText("Enviar Mensagem");
+    btSair = new JButton("Sair");
+    btSair.setToolTipText("Sair do Chat");
+    btEnviar.addActionListener(this);
+    btSair.addActionListener(this);
+    btEnviar.addKeyListener(this);
+    mensagem.addKeyListener(this);
     JScrollPane scroll = new JScrollPane(texto);
     texto.setLineWrap(true);  
-    pnlContent.add(lblHistorico);
-    pnlContent.add(scroll);
-    pnlContent.add(lblMsg);
-    pnlContent.add(MsgTxt);
-    pnlContent.add(btnSair);
-    pnlContent.add(btnSend);
-    pnlContent.setBackground(Color.LIGHT_GRAY);                                 
-    texto.setBorder(BorderFactory.createEtchedBorder(Color.BLUE,Color.BLUE));
-    MsgTxt.setBorder(BorderFactory.createEtchedBorder(Color.BLUE, Color.BLUE));                    
+    pnlConteudo.add(lblHistorico);
+    pnlConteudo.add(scroll);
+    pnlConteudo.add(lblMensagem);
+    pnlConteudo.add(mensagem);
+    pnlConteudo.add(btSair);
+    pnlConteudo.add(btEnviar);
+    pnlConteudo.setBackground(Color.LIGHT_GRAY);                                 
+    texto.setBorder(BorderFactory.createEtchedBorder(Color.BLUE,Color.BLUE)); // bordas do painel = AZUL
+    mensagem.setBorder(BorderFactory.createEtchedBorder(Color.BLUE, Color.BLUE));                    
     setTitle(txtNome.getText());
-    setContentPane(pnlContent);
+    setContentPane(pnlConteudo);
     setLocationRelativeTo(null);
     setResizable(false);
-    setSize(700,370); // largura/altura janela
+    setSize(680,360); // largura/altura janela principal
     setVisible(true);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     // Interface
     }
     
     public void conectar() throws IOException{ // conexão do cliente com o socket servidor
-    socket = new Socket(txtIP.getText(),Integer.parseInt(txtPorta.getText()));
-    out = socket.getOutputStream();
-    writer = new OutputStreamWriter(out);
-    bfwriter = new BufferedWriter(writer);
-    bfwriter.write(txtNome.getText()+"\r\n");
-    bfwriter.flush();
+        socket = new Socket(txtIP.getText(),Integer.parseInt(txtPorta.getText())); // Socktet recebe os parametros de IP e Porta
+        out = socket.getOutputStream();
+        writer = new OutputStreamWriter(out);
+        bfwriter = new BufferedWriter(writer);
+        bfwriter.write(txtNome.getText()+"\r\n");
+        bfwriter.flush();
     }
     
     public void enviarMensagem(String msg) throws IOException{ // envio de msg do cliente para o socket servidor                         
-    if(msg.equals("Sair")){
-      bfwriter.write("Desconectado \r\n");
-      texto.append("Desconectado \r\n");
-    }else{
-      bfwriter.write(msg+"\r\n");
-      texto.append( txtNome.getText() + " diz -> " + MsgTxt.getText()+"\r\n");
-    }
-    bfwriter.flush();
-    MsgTxt.setText("");        
+        if(msg.equals("Sair")){
+            bfwriter.write("Desconectado \r\n"); // <--- Caso clique no evento Sair
+            texto.append("Desconectado \r\n");
+        }else{
+            bfwriter.write(msg+"\r\n");
+            texto.append( txtNome.getText() + " disse ->  " + mensagem.getText()+"\r\n");
+        }
+        bfwriter.flush();
+        mensagem.setText("");        
     }
     
-    public void escutar() throws IOException{ // recebe msg do servidor 
-                           
-    InputStream in = socket.getInputStream();
-    InputStreamReader inr = new InputStreamReader(in);
-    BufferedReader bfr = new BufferedReader(inr);
-    String msg = "";
-                           
-    while(!"Sair".equalsIgnoreCase(msg))
-        
-        if(bfr.ready()){
-            msg = bfr.readLine();
-        if(msg.equals("Sair"))
-            texto.append("Servidor caiu! \r\n");
-        else
-         texto.append(msg+"\r\n");         
+    public void escutar() throws IOException{ // recebe msg do servidor                        
+        InputStream in = socket.getInputStream();
+        InputStreamReader inr = new InputStreamReader(in);
+        BufferedReader bfr = new BufferedReader(inr);
+        String msg = "";                     
+        while(!"Sair".equalsIgnoreCase(msg))       
+            if(bfr.ready()){
+                msg = bfr.readLine();
+            if(msg.equals("Sair"))
+                texto.append("Servidor caiu! \r\n");
+            else
+            texto.append(msg+"\r\n");         
         }
     }
     
     public void sair() throws IOException{ // desconctar o socket servidor
-    enviarMensagem("Sair");
-    bfwriter.close();
-    writer.close();
-    out.close();
-    socket.close();
+        enviarMensagem("Sair");
+        bfwriter.close();
+        writer.close();
+        out.close();
+        socket.close();
     }
     
-    public void actionPerformed(ActionEvent e) {
-          
+    public void actionPerformed(ActionEvent e) { // Controle de eventos: Enviar e Sair        
     try {
-        if(e.getActionCommand().equals(btnSend.getActionCommand()))   
-            enviarMensagem(MsgTxt.getText());
+        if(e.getActionCommand().equals(btEnviar.getActionCommand()))   
+            enviarMensagem(mensagem.getText());
         else
-        if(e.getActionCommand().equals(btnSair.getActionCommand()))
+        if(e.getActionCommand().equals(btSair.getActionCommand()))
             sair();
         }catch (IOException e1) {
             e1.printStackTrace();
         }                       
     }
     
-    public void keyPressed(KeyEvent e) {
-                
-    if(e.getKeyCode() == KeyEvent.VK_ENTER){
-        try {
-            enviarMensagem(MsgTxt.getText());
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }                                                          
-    }                       
-}
-    
-    @Override
-    public void keyReleased(KeyEvent arg0) {
-    // TODO Auto-generated method stub               
+    public void keyPressed(KeyEvent e) { // Opção press ENTER para enviar mensagem               
+        if(e.getKeyCode() == KeyEvent.VK_ENTER){
+            try {
+                enviarMensagem(mensagem.getText());
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }                                                          
+        }                       
     }
     
     @Override
-    public void keyTyped(KeyEvent arg0) {
-    // TODO Auto-generated method stub               
-    }
+    public void keyReleased(KeyEvent arg0) {}
     
-    public static void main(String []args) throws IOException{
-               
-    Cliente app = new Cliente();
-    app.conectar();
-    app.escutar();
-    }
+    @Override
+    public void keyTyped(KeyEvent arg0) {}
     
+    public static void main(String []args) throws IOException{          
+        Cliente app = new Cliente();
+        app.conectar();
+        app.escutar();
+    }
 }
