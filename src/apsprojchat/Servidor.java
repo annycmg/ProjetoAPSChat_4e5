@@ -5,9 +5,9 @@ package apsprojchat;
  *
  * @author Anny
  * 
- * Debug Servidor first and then debug Cliente as much as you need.
+ * 
  */
-
+   
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -24,7 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 public class Servidor extends Thread {
-    private static ArrayList<BufferedWriter>clientes; // variavel arraylist, que comporta um ou vários clientes (multithread)        
+    private static ArrayList<BufferedWriter>clientes; // variavel arraylist, que comporta um ou vários usuários (multithread)        
     private static ServerSocket server; 
     private String nome;
     private Socket conexao;
@@ -32,10 +32,14 @@ public class Servidor extends Thread {
     private InputStreamReader inReader;  
     private BufferedReader bfr;
 
-    //DEBUG O APP:
-    //Debug Servidor primeiro e então debug Cliente depois quants vezes quiser.
-    //==================================================================
-
+    // DEBUG O APP:
+    // Debug Servidor primeiro e então debug Cliente depois quantas vezes quiser para ser multithread.
+    // Para a aplicação rodar todos os usuários têm que ter o MESMO NÚMERO de IP e PORTA,
+    // caso contrário a conexão não é sucedida.
+    //===============================================================================================
+    // Requisito de S.O: Comando NETSTAT --->  Abrir prompt de comando e digitar: [netstat -a]
+    // Aparecerá o número de IP e de porta usado na aplicação com conexão status ESTABILISHED
+    //=======================================================================================
     // Passos para um chat via TCP/IP:
     // Step 1: In any Client/Server Application, we need to run the server before the client, because the server keeps waiting for the client to be connected.
     // Step 2: Server keeps listening for the client on an assigned IP & Port
