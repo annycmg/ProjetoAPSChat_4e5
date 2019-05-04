@@ -46,7 +46,7 @@ public class Servidor extends Thread {
     // Step 3: For establishing connection client must know the IP & Port of the server.
     // Step 4: When we start Client Application, It creates a connection to the server.
     // Step 5: After the Successful connection Client & Server Applications can send & receive messages.
-
+ 
     public Servidor(Socket con){ // conexão do Servidor com o Cliente
         this.conexao = con;
         try {

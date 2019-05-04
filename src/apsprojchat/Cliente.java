@@ -17,7 +17,7 @@ import java.io.Writer;
 import java.net.Socket;
 import javax.swing.*;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
-
+ 
 public class Cliente extends JFrame implements ActionListener, KeyListener{
 private static final long serialVersionUID = 1L;
 private JTextArea texto;
