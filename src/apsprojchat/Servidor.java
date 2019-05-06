@@ -83,7 +83,7 @@ public class Servidor extends Thread {
         for(BufferedWriter bw : clientes){
             bwS = (BufferedWriter)bw;
             if(!(bwSaida == bwS)){
-                bw.write(nome + " -> " + msg+"\r\n");
+                bw.write(nome + " disse -> " + msg+"\r\n");
                 bw.flush(); 
             }
         }          
@@ -93,7 +93,7 @@ public class Servidor extends Thread {
         try{
             //Criação dos objetos para instanciar/iniciar o servidor
             JLabel lblMessage = new JLabel("Porta do Servidor:");
-            JTextField txtPorta = new JTextField("12345"); // nº de porta de porta padrão
+            JTextField txtPorta = new JTextField("12345"); // nº de porta padrão
             Object[] texts = {lblMessage, txtPorta };  
             JOptionPane.showMessageDialog(null, texts);
             server = new ServerSocket(Integer.parseInt(txtPorta.getText()));

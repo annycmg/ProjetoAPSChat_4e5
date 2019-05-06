@@ -40,7 +40,7 @@ private JTextField txtNome;
     JLabel lblMessage = new JLabel("Verificar!");
     txtIP = new JTextField("192.168.0.7"); // <--- IP padrão
     txtPorta = new JTextField("12345"); // <--- porta padrão
-    txtNome = new JTextField("Cliente-Servidor"); // <--- nickname cliente padrão              
+    txtNome = new JTextField("Cliente-Servidor"); // <--- nickname padrão              
     Object[] texts = {lblMessage, txtIP, txtPorta, txtNome };  
     JOptionPane.showMessageDialog(null, texts);              
     pnlConteudo = new JPanel();
@@ -48,6 +48,7 @@ private JTextField txtNome;
     texto.setFont(new Font("Dialog",Font.BOLD,14)); // Tamanho da fonte na txtArea
     texto.setEditable(false);
     texto.setBackground(new Color(240,240,240));
+    texto.append("BEM VINDO AO JOGO DA FORCA!!! \r\n");   
     mensagem = new JTextField(53); // largura txtField Mensagem
     mensagem.setFont(new Font("Dialog",Font.BOLD,15)); // Tamanho da fonte no txtField
     lblHistorico = new JLabel("Histórico");
@@ -95,6 +96,7 @@ private JTextField txtNome;
             bfwriter.write("Desconectado \r\n"); // <--- Caso clique no evento Sair
             texto.append("Desconectado \r\n");
         }else{
+            //texto.append("BEM VINDO AO JOGO DA FORCA !!! \r\n");
             bfwriter.write(msg+"\r\n");
             texto.append( txtNome.getText() + " disse ->  " + mensagem.getText()+"\r\n");
         }
@@ -106,7 +108,7 @@ private JTextField txtNome;
         InputStream in = socket.getInputStream();
         InputStreamReader inr = new InputStreamReader(in);
         BufferedReader bfr = new BufferedReader(inr);
-        String msg = "";                     
+        String msg = "";         
         while(!"Sair".equalsIgnoreCase(msg))       
             if(bfr.ready()){
                 msg = bfr.readLine();
