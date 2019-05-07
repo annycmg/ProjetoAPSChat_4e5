@@ -24,7 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 public class Servidor extends Thread {
-    private static ArrayList<BufferedWriter>clientes; // variavel arraylist, que comporta um ou vários usuários (multithread)        
+    private static ArrayList<ClienteAtivos>clientes; // variavel arraylist, que comporta um ou vários usuários (multithread)        
     private static ServerSocket server; 
     private String nome;
     private Socket conexao;
@@ -60,17 +60,19 @@ public class Servidor extends Thread {
 
     public void run(){ // verifica se há alguma mensagem nova
         try{                                   
-            String msg;
+            String msg = "";
             OutputStream ou =  this.conexao.getOutputStream();
             Writer ouw = new OutputStreamWriter(ou);
             BufferedWriter bfw = new BufferedWriter(ouw); 
-            clientes.add(bfw);
-            nome = msg = bfr.readLine();       
+            nome = bfr.readLine(); 
+            System.out.println(nome+" entrou!");
+            clientes.add(new ClienteAtivos(nome, bfw));
+                  
             while(!"Sair".equalsIgnoreCase(msg) && msg != null)
             {           
                 msg = bfr.readLine();
                 sendToAll(bfw, msg);
-                System.out.println(msg);                                              
+                //System.out.println(msg);                                              
             }
         }catch (Exception e) {
             e.printStackTrace();
@@ -80,11 +82,12 @@ public class Servidor extends Thread {
     public void sendToAll(BufferedWriter bwSaida, String msg) throws  IOException 
     { // quando uma msg é enviada por um cliente, ela é replicada para todos os outros da Thread
         BufferedWriter bwS;
-        for(BufferedWriter bw : clientes){
-            bwS = (BufferedWriter)bw;
+        for(ClienteAtivos ca : clientes){
+            bwS = (BufferedWriter)ca.getBfw();
             if(!(bwSaida == bwS)){
-                bw.write(nome + " disse -> " + msg+"\r\n");
-                bw.flush(); 
+                ca.getBfw().write(nome + " disse -> " + msg+"\r\n");
+                System.out.println(nome + " disse -> " + msg);
+                ca.getBfw().flush(); 
             }
         }          
     }
@@ -93,11 +96,11 @@ public class Servidor extends Thread {
         try{
             //Criação dos objetos para instanciar/iniciar o servidor
             JLabel lblMessage = new JLabel("Porta do Servidor:");
-            JTextField txtPorta = new JTextField("12345"); // nº de porta padrão
+            JTextField txtPorta = new JTextField("5151"); // nº de porta padrão
             Object[] texts = {lblMessage, txtPorta };  
             JOptionPane.showMessageDialog(null, texts);
             server = new ServerSocket(Integer.parseInt(txtPorta.getText()));
-            clientes = new ArrayList<BufferedWriter>();
+            clientes = new ArrayList<ClienteAtivos>();
             JOptionPane.showMessageDialog(null,"Servidor ativo na porta: "+         
             txtPorta.getText());
     
