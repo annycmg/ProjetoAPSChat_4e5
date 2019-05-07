@@ -59,11 +59,12 @@ public class Servidor extends Thread {
     }
 
     public void run(){ // verifica se há alguma mensagem nova
-        try{                                   
-            String msg = "";
+        String msg = "";
+        BufferedWriter bfw = null;
+        try{
             OutputStream ou =  this.conexao.getOutputStream();
             Writer ouw = new OutputStreamWriter(ou);
-            BufferedWriter bfw = new BufferedWriter(ouw); 
+            bfw = new BufferedWriter(ouw);
             nome = bfr.readLine(); 
             System.out.println(nome+" entrou!");
             clientes.add(new ClienteAtivos(nome, bfw));
@@ -75,18 +76,40 @@ public class Servidor extends Thread {
                 //System.out.println(msg);                                              
             }
         }catch (Exception e) {
+            if(e.getMessage().equals("Connection reset")){
+                System.out.println("Usuario "+nome+" saiu!");
+                try {
+                    sendToAllExit( "Usuario "+nome+" saiu!");
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            }else
             e.printStackTrace();
         }                       
     }
+    public void sendConsole(String message){
+        System.out.println(message);
+    }
 
+    public void sendToAllExit(String msg){
+        for(ClienteAtivos ca : clientes){
+            try {
+                ca.getBfw().write(msg);
+                ca.getBfw().flush();
+            }catch (Exception e)
+            {
+                clientes.remove(ca);
+            }
+        }
+    }
     public void sendToAll(BufferedWriter bwSaida, String msg) throws  IOException 
     { // quando uma msg é enviada por um cliente, ela é replicada para todos os outros da Thread
         BufferedWriter bwS;
         for(ClienteAtivos ca : clientes){
-            bwS = (BufferedWriter)ca.getBfw();
+            bwS = ca.getBfw();
             if(!(bwSaida == bwS)){
                 ca.getBfw().write(nome + " disse -> " + msg+"\r\n");
-                System.out.println(nome + " disse -> " + msg);
+                sendConsole(nome + " disse -> " + msg);
                 ca.getBfw().flush(); 
             }
         }          

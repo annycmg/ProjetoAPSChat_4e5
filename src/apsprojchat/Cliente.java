@@ -35,11 +35,11 @@ private JTextField txtIP;
 private JTextField txtPorta;
 private JTextField txtNome;
 
-    public Cliente() throws IOException{     
+    public Cliente(){
     // Interface
     JLabel lblMessage = new JLabel("Verificar!");
-    txtIP = new JTextField("192.168.0.7"); // <--- IP padrão
-    txtPorta = new JTextField("12345"); // <--- porta padrão
+    txtIP = new JTextField("0.0.0.0"); // <--- IP padrão
+    txtPorta = new JTextField("5151"); // <--- porta padrão
     txtNome = new JTextField("Cliente-Servidor"); // <--- nickname padrão              
     Object[] texts = {lblMessage, txtIP, txtPorta, txtNome };  
     JOptionPane.showMessageDialog(null, texts);              
@@ -155,9 +155,13 @@ private JTextField txtNome;
     @Override
     public void keyTyped(KeyEvent arg0) {}
     
-    public static void main(String []args) throws IOException{          
-        Cliente app = new Cliente();
-        app.conectar();
-        app.escutar();
+    public static void main(String []args) throws IOException{
+        try {
+            Cliente app = new Cliente();
+            app.conectar();
+            app.escutar();
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(null,e.getMessage());
+        }
     }
 }
