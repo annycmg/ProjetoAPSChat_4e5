@@ -92,26 +92,31 @@ public class Servidor extends Thread {
     }
 
     public void sendToAllExit(String msg){
+        ClienteAtivos removeCA = null;
         for(ClienteAtivos ca : clientes){
             try {
-                ca.getBfw().write(msg);
+                ca.getBfw().write(msg+"\r\n");
                 ca.getBfw().flush();
             }catch (Exception e)
             {
-                clientes.remove(ca);
+                e.getMessage();
+                removeCA = ca;
             }
         }
+        if(removeCA != null)
+            clientes.remove(removeCA);
     }
     public void sendToAll(BufferedWriter bwSaida, String msg) throws  IOException 
     { // quando uma msg é enviada por um cliente, ela é replicada para todos os outros da Thread
         BufferedWriter bwS;
         for(ClienteAtivos ca : clientes){
             bwS = ca.getBfw();
+
             if(!(bwSaida == bwS)){
                 ca.getBfw().write(nome + " disse -> " + msg+"\r\n");
-                sendConsole(nome + " disse -> " + msg);
                 ca.getBfw().flush(); 
-            }
+            }else
+                sendConsole(nome + " disse -> " + msg);
         }          
     }
     
