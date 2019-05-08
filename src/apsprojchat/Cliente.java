@@ -44,7 +44,7 @@ private JTextField txtNome;
     Object[] texts = {lblMessage, txtIP, txtPorta, txtNome };  
     JOptionPane.showMessageDialog(null, texts);              
     pnlConteudo = new JPanel();
-    texto = new JTextArea(11,53); // altura/largura txtArea Histórico
+    texto = new JTextArea(29,53); // altura/largura txtArea Histórico
     texto.setFont(new Font("Dialog",Font.BOLD,14)); // Tamanho da fonte na txtArea
     texto.setEditable(false);
     texto.setBackground(new Color(240,240,240));
@@ -76,7 +76,7 @@ private JTextField txtNome;
     setContentPane(pnlConteudo);
     setLocationRelativeTo(null);
     setResizable(false);
-    setSize(680,360); // largura/altura janela principal
+    setSize(680,705); // largura/altura janela principal
     setVisible(true);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     // Interface

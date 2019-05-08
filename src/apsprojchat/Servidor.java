@@ -122,6 +122,13 @@ public class Servidor extends Thread {
     
     public static void main(String[] args) {
         try{
+            //Tela inicial 
+            if (JOptionPane.showConfirmDialog(null, "\n\n\n        Vamos iniciar o Chat do Jogo da Forca?                 \n\n\n\n",
+                    "Chat do Jogo da Forca", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                // yes option
+            }else {
+                System.exit(0);
+            }
             //Criação dos objetos para instanciar/iniciar o servidor
             JLabel lblMessage = new JLabel("Porta do Servidor:");
             JTextField txtPorta = new JTextField("5151"); // nº de porta padrão
