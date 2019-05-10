@@ -1,7 +1,6 @@
 package apsprojchat;
    
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -16,11 +15,20 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
 import javax.swing.*;
+import javax.swing.text.*;
+
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
  
 public class Cliente extends JFrame implements ActionListener, KeyListener{
 private static final long serialVersionUID = 1L;
-private JTextArea texto;
+
+
+private JTextPane texto;
+private SimpleAttributeSet esq;
+private SimpleAttributeSet dir;
+private SimpleAttributeSet cen;
+private StyledDocument doc;
+
 private JTextField mensagem;
 private JButton btEnviar;
 private JButton btSair;
@@ -37,49 +45,70 @@ private JTextField txtNome;
 
     public Cliente(){
     // Interface
-    JLabel lblMessage = new JLabel("Verificar!");
-    txtIP = new JTextField("0.0.0.0"); // <--- IP padrão
-    txtPorta = new JTextField("5151"); // <--- porta padrão
-    txtNome = new JTextField("Cliente-Servidor"); // <--- nickname padrão              
-    Object[] texts = {lblMessage, txtIP, txtPorta, txtNome };  
-    JOptionPane.showMessageDialog(null, texts);              
-    pnlConteudo = new JPanel();
-    texto = new JTextArea(29,53); // altura/largura txtArea Histórico
-    texto.setFont(new Font("Dialog",Font.BOLD,14)); // Tamanho da fonte na txtArea
-    texto.setEditable(false);
-    texto.setBackground(new Color(240,240,240));
-    texto.append("BEM VINDO AO JOGO DA FORCA!!! \r\n");   
-    mensagem = new JTextField(53); // largura txtField Mensagem
-    mensagem.setFont(new Font("Dialog",Font.BOLD,15)); // Tamanho da fonte no txtField
-    lblHistorico = new JLabel("Histórico");
-    lblMensagem = new JLabel("Mensagem");
-    btEnviar = new JButton("Enviar");
-    btEnviar.setToolTipText("Enviar Mensagem");
-    btSair = new JButton("Sair");
-    btSair.setToolTipText("Sair do Chat");
-    btEnviar.addActionListener(this);
-    btSair.addActionListener(this);
-    btEnviar.addKeyListener(this);
-    mensagem.addKeyListener(this);
-    JScrollPane scroll = new JScrollPane(texto);
-    texto.setLineWrap(true);  
-    pnlConteudo.add(lblHistorico);
-    pnlConteudo.add(scroll);
-    pnlConteudo.add(lblMensagem);
-    pnlConteudo.add(mensagem);
-    pnlConteudo.add(btSair);
-    pnlConteudo.add(btEnviar);
-    pnlConteudo.setBackground(Color.LIGHT_GRAY);                                 
-    texto.setBorder(BorderFactory.createEtchedBorder(Color.BLUE,Color.BLUE)); // bordas do painel = AZUL
-    mensagem.setBorder(BorderFactory.createEtchedBorder(Color.BLUE, Color.BLUE));                    
-    setTitle(txtNome.getText());
-    setContentPane(pnlConteudo);
-    setLocationRelativeTo(null);
-    setResizable(false);
-    setSize(680,705); // largura/altura janela principal
-    setVisible(true);
-    setDefaultCloseOperation(EXIT_ON_CLOSE);
-    // Interface
+        try {
+            JLabel lblMessage = new JLabel("Verificar!");
+            txtIP = new JTextField("0.0.0.0"); // <--- IP padrão
+            txtPorta = new JTextField("5151"); // <--- porta padrão
+            txtNome = new JTextField("Cliente-Servidor"); // <--- nickname padrão
+            Object[] texts = {lblMessage, txtIP, txtPorta, txtNome};
+            JOptionPane.showMessageDialog(null, texts);
+            pnlConteudo = new JPanel();
+
+
+            texto = new JTextPane(); // altura/largura txtArea Históric
+            texto.setPreferredSize(new Dimension(550,550));
+            texto.setEditable(false);
+            doc = texto.getStyledDocument();
+            esq = new SimpleAttributeSet();
+            StyleConstants.setAlignment(esq, StyleConstants.ALIGN_LEFT);
+            StyleConstants.setForeground(esq, Color.BLACK);
+            dir = new SimpleAttributeSet();
+            StyleConstants.setAlignment(dir, StyleConstants.ALIGN_RIGHT);
+            StyleConstants.setForeground(dir, Color.blue);
+            cen = new SimpleAttributeSet();
+            StyleConstants.setAlignment(cen,StyleConstants.ALIGN_CENTER);
+            StyleConstants.setForeground(cen,Color.red);
+
+//            texto.setFont(new Font("Dialog", Font.BOLD, 14)); // Tamanho da fonte na txtArea
+//            texto.setEditable(false);
+//            texto.setBackground(new Color(240, 240, 240));
+            doc.setParagraphAttributes(doc.getLength(),1,cen,false);
+            doc.insertString(doc.getLength(), "BEM VINDO AO JOGO DA FORCA!!! \r\n", cen);
+
+
+            mensagem = new JTextField(53); // largura txtField Mensagem
+            mensagem.setFont(new Font("Dialog", Font.BOLD, 15)); // Tamanho da fonte no txtField
+            lblHistorico = new JLabel("Histórico");
+            lblMensagem = new JLabel("Mensagem");
+            btEnviar = new JButton("Enviar");
+            btEnviar.setToolTipText("Enviar Mensagem");
+            btSair = new JButton("Sair");
+            btSair.setToolTipText("Sair do Chat");
+            btEnviar.addActionListener(this);
+            btSair.addActionListener(this);
+            btEnviar.addKeyListener(this);
+            mensagem.addKeyListener(this);
+            JScrollPane scroll = new JScrollPane(texto);
+            pnlConteudo.add(lblHistorico);
+            pnlConteudo.add(scroll);
+            pnlConteudo.add(lblMensagem);
+            pnlConteudo.add(mensagem);
+            pnlConteudo.add(btSair);
+            pnlConteudo.add(btEnviar);
+            pnlConteudo.setBackground(Color.LIGHT_GRAY);
+            texto.setBorder(BorderFactory.createEtchedBorder(Color.BLUE, Color.BLUE)); // bordas do painel = AZUL
+            mensagem.setBorder(BorderFactory.createEtchedBorder(Color.BLUE, Color.BLUE));
+            setTitle(txtNome.getText());
+            setContentPane(pnlConteudo);
+            setLocationRelativeTo(null);
+            setResizable(false);
+            setSize(680, 705); // largura/altura janela principal
+            setVisible(true);
+            setDefaultCloseOperation(EXIT_ON_CLOSE);
+            // Interface
+        }catch (Exception e){
+            System.out.println(e.getStackTrace());
+        }
     }
     
     public void conectar() throws IOException{ // conexão do cliente com o socket servidor
@@ -91,20 +120,27 @@ private JTextField txtNome;
         bfwriter.flush();
     }
     
-    public void enviarMensagem(String msg) throws IOException{ // envio de msg do cliente para o socket servidor                         
+    public void enviarMensagem(String msg) throws IOException, BadLocationException { // envio de msg do cliente para o socket servidor
         if(msg.equals("Sair")){
             bfwriter.write("Desconectado \r\n"); // <--- Caso clique no evento Sair
-            texto.append("Desconectado \r\n");
+            doc.setParagraphAttributes(doc.getLength(),1,dir,false);
+            doc.insertString(doc.getLength(), "Desconectado \r\n", dir);
+            //doc.setParagraphAttributes(doc.getLength(),1,esq,false);
+            //texto.append("Desconectado \r\n");
         }else{
             //texto.append("BEM VINDO AO JOGO DA FORCA !!! \r\n");
             bfwriter.write(msg+"\r\n");
-            texto.append( txtNome.getText() + " disse ->  " + mensagem.getText()+"\r\n");
+//            texto.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+//            texto.append( txtNome.getText() + " disse ->  " + mensagem.getText()+"\r\n");
+            doc.setParagraphAttributes(doc.getLength(),1,dir,false);
+            doc.insertString(doc.getLength(), txtNome.getText() + " disse ->  " + mensagem.getText()+"\r\n", dir);
+
         }
         bfwriter.flush();
         mensagem.setText("");        
     }
     
-    public void escutar() throws IOException{ // recebe msg do servidor                        
+    public void escutar() throws IOException,BadLocationException{ // recebe msg do servidor
         InputStream in = socket.getInputStream();
         InputStreamReader inr = new InputStreamReader(in);
         BufferedReader bfr = new BufferedReader(inr);
@@ -112,14 +148,22 @@ private JTextField txtNome;
         while(!"Sair".equalsIgnoreCase(msg))       
             if(bfr.ready()){
                 msg = bfr.readLine();
-            if(msg.equals("Sair"))
-                texto.append("Servidor caiu! \r\n");
-            else
-            texto.append(msg+"\r\n");         
+            if(msg.equals("Sair")) {
+                doc.setParagraphAttributes(doc.getLength(),1,esq,false);
+                doc.insertString(doc.getLength(), "Servidor caiu! \r\n", esq);
+
+            }
+            else{
+//                texto.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+//                texto.append(msg+"\r\n");
+                doc.setParagraphAttributes(doc.getLength(),1,esq,false);
+                doc.insertString(doc.getLength(),  msg+"\r\n", esq);
+
+            }
         }
     }
     
-    public void sair() throws IOException{ // desconctar o socket servidor
+    public void sair() throws IOException,BadLocationException{ // desconctar o socket servidor
         enviarMensagem("Sair");
         bfwriter.close();
         writer.close();
@@ -134,7 +178,7 @@ private JTextField txtNome;
         else
         if(e.getActionCommand().equals(btSair.getActionCommand()))
             sair();
-        }catch (IOException e1) {
+        }catch (Exception e1) {
             e1.printStackTrace();
         }                       
     }
@@ -143,7 +187,7 @@ private JTextField txtNome;
         if(e.getKeyCode() == KeyEvent.VK_ENTER){
             try {
                 enviarMensagem(mensagem.getText());
-            } catch (IOException e1) {
+            } catch (Exception e1) {
                 e1.printStackTrace();
             }                                                          
         }                       
