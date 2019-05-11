@@ -1,10 +1,13 @@
 package apsprojchat;
-   
-import java.awt.*;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -14,11 +17,19 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
-import javax.swing.*;
-import javax.swing.text.*;
 
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.text.*;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
- 
+
 public class Cliente extends JFrame implements ActionListener, KeyListener{
 private static final long serialVersionUID = 1L;
 
@@ -55,8 +66,8 @@ private JTextField txtNome;
             pnlConteudo = new JPanel();
 
 
-            texto = new JTextPane(); // altura/largura txtArea Históric
-            texto.setPreferredSize(new Dimension(550,550));
+            texto = new JTextPane(); // LARGURA/ALTURA txtArea Históric
+            texto.setPreferredSize(new Dimension(600,545));
             texto.setEditable(false);
             doc = texto.getStyledDocument();
             esq = new SimpleAttributeSet();
@@ -74,12 +85,12 @@ private JTextField txtNome;
 //            texto.setBackground(new Color(240, 240, 240));
             doc.setParagraphAttributes(doc.getLength(),1,cen,false);
             doc.insertString(doc.getLength(), "BEM VINDO AO JOGO DA FORCA!!! \r\n", cen);
-
-
+            Style style = doc.getStyle(StyleContext.DEFAULT_STYLE);
+            StyleConstants.setFontSize(style, 17);
             mensagem = new JTextField(53); // largura txtField Mensagem
-            mensagem.setFont(new Font("Dialog", Font.BOLD, 15)); // Tamanho da fonte no txtField
-            lblHistorico = new JLabel("Histórico");
-            lblMensagem = new JLabel("Mensagem");
+            mensagem.setFont(new Font("Dialog", Font.BOLD, 14)); // Tamanho da fonte no txtField
+            lblHistorico = new JLabel("HISTÓRICO");           
+            lblMensagem = new JLabel("MENSAGEM");
             btEnviar = new JButton("Enviar");
             btEnviar.setToolTipText("Enviar Mensagem");
             btSair = new JButton("Sair");
@@ -96,13 +107,13 @@ private JTextField txtNome;
             pnlConteudo.add(btSair);
             pnlConteudo.add(btEnviar);
             pnlConteudo.setBackground(Color.LIGHT_GRAY);
-            texto.setBorder(BorderFactory.createEtchedBorder(Color.BLUE, Color.BLUE)); // bordas do painel = AZUL
-            mensagem.setBorder(BorderFactory.createEtchedBorder(Color.BLUE, Color.BLUE));
+            texto.setBorder(BorderFactory.createLineBorder(Color.BLUE,3));
+            mensagem.setBorder(BorderFactory.createLineBorder(Color.BLUE,3));
             setTitle(txtNome.getText());
             setContentPane(pnlConteudo);
             setLocationRelativeTo(null);
             setResizable(false);
-            setSize(680, 705); // largura/altura janela principal
+            setSize(680, 700); // largura/altura janela principal
             setVisible(true);
             setDefaultCloseOperation(EXIT_ON_CLOSE);
             // Interface
@@ -133,7 +144,7 @@ private JTextField txtNome;
 //            texto.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 //            texto.append( txtNome.getText() + " disse ->  " + mensagem.getText()+"\r\n");
             doc.setParagraphAttributes(doc.getLength(),1,dir,false);
-            doc.insertString(doc.getLength(), txtNome.getText() + " disse ->  " + mensagem.getText()+"\r\n", dir);
+            doc.insertString(doc.getLength(), txtNome.getText() + " disse ->  " + mensagem.getText()+" " + "\r\n", dir);
 
         }
         bfwriter.flush();
@@ -157,7 +168,7 @@ private JTextField txtNome;
 //                texto.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 //                texto.append(msg+"\r\n");
                 doc.setParagraphAttributes(doc.getLength(),1,esq,false);
-                doc.insertString(doc.getLength(),  msg+"\r\n", esq);
+                doc.insertString(doc.getLength(), " " + msg+"\r\n", esq);
 
             }
         }
