@@ -32,20 +32,20 @@ import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
 public class Cliente extends JFrame implements ActionListener, KeyListener{
 private static final long serialVersionUID = 1L;
-
-
+// variaveis do chat
 private JTextPane texto;
 private SimpleAttributeSet esq;
 private SimpleAttributeSet dir;
 private SimpleAttributeSet cen;
 private StyledDocument doc;
-
+// variaveis da interface
 private JTextField mensagem;
 private JButton btEnviar;
 private JButton btSair;
 private JLabel lblHistorico;
 private JLabel lblMensagem;
 private JPanel pnlConteudo;
+// variaveis do cliente
 private Socket socket;
 private OutputStream out;
 private Writer writer; 
@@ -55,7 +55,7 @@ private JTextField txtPorta;
 private JTextField txtNome;
 
     public Cliente(){
-    // Interface
+        // Interface conexão do cliente
         try {
             JLabel lblMessage = new JLabel("Verificar!");
             txtIP = new JTextField("0.0.0.0"); // <--- IP padrão
@@ -65,7 +65,7 @@ private JTextField txtNome;
             JOptionPane.showMessageDialog(null, texts);
             pnlConteudo = new JPanel();
 
-
+            // Textos do chat
             texto = new JTextPane(); // LARGURA/ALTURA txtArea Históric
             texto.setPreferredSize(new Dimension(600,545));
             texto.setEditable(false);
@@ -79,14 +79,16 @@ private JTextField txtNome;
             cen = new SimpleAttributeSet();
             StyleConstants.setAlignment(cen,StyleConstants.ALIGN_CENTER);
             StyleConstants.setForeground(cen,Color.red);
-
 //            texto.setFont(new Font("Dialog", Font.BOLD, 14)); // Tamanho da fonte na txtArea
 //            texto.setEditable(false);
 //            texto.setBackground(new Color(240, 240, 240));
             doc.setParagraphAttributes(doc.getLength(),1,cen,false);
             doc.insertString(doc.getLength(), "BEM VINDO AO JOGO DA FORCA!!! \r\n", cen);
+//          doc.insertString(doc.getLength(), "Escolha uma letra ou Adivinhe a palavra? \r\n" , cen);
             Style style = doc.getStyle(StyleContext.DEFAULT_STYLE);
             StyleConstants.setFontSize(style, 17);
+            
+            //Componentes da interface do chat
             mensagem = new JTextField(53); // largura txtField Mensagem
             mensagem.setFont(new Font("Dialog", Font.BOLD, 14)); // Tamanho da fonte no txtField
             lblHistorico = new JLabel("HISTÓRICO");           
@@ -139,7 +141,6 @@ private JTextField txtNome;
             //doc.setParagraphAttributes(doc.getLength(),1,esq,false);
             //texto.append("Desconectado \r\n");
         }else{
-            //texto.append("BEM VINDO AO JOGO DA FORCA !!! \r\n");
             bfwriter.write(msg+"\r\n");
 //            texto.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 //            texto.append( txtNome.getText() + " disse ->  " + mensagem.getText()+"\r\n");
@@ -194,7 +195,7 @@ private JTextField txtNome;
         }                       
     }
     
-    public void keyPressed(KeyEvent e) { // Opção press ENTER para enviar mensagem               
+    public void keyPressed(KeyEvent e) { // Opção press ENTER            
         if(e.getKeyCode() == KeyEvent.VK_ENTER){
             try {
                 enviarMensagem(mensagem.getText());
