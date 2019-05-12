@@ -41,8 +41,10 @@ public class TesteForca2 {
         //a variavel recebe um valor int randomizado do indice de uma das palavras
         int indiceSorteado = random.nextInt(quantPalavras);
 
+        //a variavel recebe o indice da palavra sorteada.
         int dica = indiceSorteado;
 
+        // a variavel recebe o resultado do indice e faz com que seja igual ao indice da palavra
         String dicaSorteada = "DICA : " + getDicas()[dica];
 
         //variavel recebe a palavra sorteada
