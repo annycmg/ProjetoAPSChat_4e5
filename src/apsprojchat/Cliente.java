@@ -156,7 +156,8 @@ private JTextField txtNome;
         InputStream in = socket.getInputStream();
         InputStreamReader inr = new InputStreamReader(in);
         BufferedReader bfr = new BufferedReader(inr);
-        String msg = "";         
+        String msg = "";
+        String[] aux = null;
         while(!"Sair".equalsIgnoreCase(msg))       
             if(bfr.ready()){
                 msg = bfr.readLine();
@@ -168,6 +169,12 @@ private JTextField txtNome;
             else{
 //                texto.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 //                texto.append(msg+"\r\n");
+                if(msg.contains("se conectou no chat")) {
+                    aux = msg.split("Usuario:");
+                    msg = aux[1];
+                }
+                if(msg.contains("use !start para iniciar"))
+                    msg = "use !start para iniciar o game.";
                 doc.setParagraphAttributes(doc.getLength(),1,esq,false);
                 doc.insertString(doc.getLength(), " " + msg+"\r\n", esq);
 
