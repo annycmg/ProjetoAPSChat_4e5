@@ -31,7 +31,6 @@ public class Servidor extends Thread {
     private InputStream input;  
     private InputStreamReader inReader;  
     private BufferedReader bfr;
-    private Forca forca;
 
     // DEBUG O APP:
     // Debug Servidor primeiro e então debug Cliente depois quantas vezes quiser para ser multithread.
@@ -54,7 +53,6 @@ public class Servidor extends Thread {
             input  = con.getInputStream();
             inReader = new InputStreamReader(input);
             bfr = new BufferedReader(inReader);
-            forca = new Forca();
         } catch (IOException e) {
             e.printStackTrace();
         }                          
@@ -77,11 +75,12 @@ public class Servidor extends Thread {
             {           
                 msg = bfr.readLine();
                 if(msg.contains("!start")){
-                    if(forca.isGameStart()){
+                    if(TesteForca2.gameStart){
                         sendToAlls("Jogo já foi iniciado!\r\n");
                     }else{
-                        forca.setGameStart(true);
+                        TesteForca2.gameStart = true;
                         sendToAlls("Jogo foi iniciado!");
+                        sendToAlls(TesteForca2.metodoForcaStart());
                     }
                 }else {
                     sendToAll(bfw, msg);
