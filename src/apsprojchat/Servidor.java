@@ -31,6 +31,7 @@ public class Servidor extends Thread {
     private InputStream input;  
     private InputStreamReader inReader;  
     private BufferedReader bfr;
+    private Forca forca;
 
     // DEBUG O APP:
     // Debug Servidor primeiro e então debug Cliente depois quantas vezes quiser para ser multithread.
@@ -53,6 +54,7 @@ public class Servidor extends Thread {
             input  = con.getInputStream();
             inReader = new InputStreamReader(input);
             bfr = new BufferedReader(inReader);
+            forca = new Forca();
         } catch (IOException e) {
             e.printStackTrace();
         }                          
@@ -68,12 +70,23 @@ public class Servidor extends Thread {
             nome = bfr.readLine(); 
             System.out.println(nome+" entrou!");
             clientes.add(new ClienteAtivos(nome, bfw));
+            sendToAll(bfw,"Usuario: "+nome+" se conectou no chat");
+            sendToAll(bfw,"use !start para iniciar o game");
                   
             while(!"Sair".equalsIgnoreCase(msg) && msg != null)
             {           
                 msg = bfr.readLine();
-                sendToAll(bfw, msg);
-                //System.out.println(msg);                                              
+                if(msg.contains("!start")){
+                    if(forca.isGameStart()){
+                        sendToAlls("Jogo já foi iniciado!\r\n");
+                    }else{
+                        forca.setGameStart(true);
+                        sendToAlls("Jogo foi iniciado!");
+                    }
+                }else {
+                    sendToAll(bfw, msg);
+                    //System.out.println(msg);
+                }
             }
         }catch (Exception e) {
             if(e.getMessage().equals("Connection reset")){
@@ -90,7 +103,16 @@ public class Servidor extends Thread {
     public void sendConsole(String message){
         System.out.println(message);
     }
-
+    public void sendToAlls(String msg){
+        for(ClienteAtivos ca : clientes){
+            try{
+                ca.getBfw().write(msg+"\r\n");
+                ca.getBfw().flush();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
     public void sendToAllExit(String msg){
         ClienteAtivos removeCA = null;
         for(ClienteAtivos ca : clientes){

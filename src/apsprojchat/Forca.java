@@ -8,6 +8,7 @@ public class Forca {
     private static int INICIO = 0;
     private static int TENTATIVA = 1;
     private static int DECISAO = 3;
+    private static boolean gameStart = false;
     private String palavravez = ""; // palavra que deve ser adivinhada
     private int npalavra,  dica,  tamanho = 0;
     private int state = INICIO;
@@ -45,6 +46,15 @@ public class Forca {
     /**Retorna o vetor de palavras
     * @return palavras
     */
+
+    public boolean isGameStart() {
+        return gameStart;
+    }
+
+    public void setGameStart(boolean gameStart) {
+        this.gameStart = gameStart;
+    }
+
     public String[] getPalavras() {
         return palavras;
     }
