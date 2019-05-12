@@ -1,3 +1,5 @@
+package apsprojchat;
+
 import java.util.Random;
 import java.util.Scanner;
 
@@ -16,6 +18,7 @@ public class TesteForca2 {
             "DEGRADAÇÃO DAS PROPRIEDADES FÍSICAS OU QUÍMICAS DO ECOSSISTEMAS.", // dica: POLUICAO
             "BACIA QUE ABRANGE 7 MILHÕES DE QUILÔMETROS QUADRADOS, DOS QUAIS 5 MILHÕES E MEIO QUILÔMETROS QUADRADOS SÃO COBERTOS PELA FLORESTA TROPICAL."}; // dica: AMAZONIA
 
+    private static boolean gameStart = false;
 
     //dica = getNpalavra(); // dica dá um get no indice da palavra sorteada, isso une uma palavra com uma dica
     //doc = "DICA: " + getDicas()[dica]; // traz a dica referente a palavra sorteada
@@ -77,8 +80,18 @@ public class TesteForca2 {
                     + "\nletras utilizadas: " + letrasUtilizadas
                     + "\nDica da palavra : " + dicaSorteada
                     + "\nQual letra vc deseja tentar ? ");
-            letra = in.next().toUpperCase().charAt(0);
+            letra = in.next().toUpperCase().charAt(0); // faz com que a entrada do usuario seja sempre reconhecida como letra MAIUSCULA
+
+            String letrasIguais = String.valueOf(letra);
             letrasUtilizadas += "" + letra;
+
+            if(letrasUtilizadas == letrasIguais){
+                System.out.println("Letra ja foi utilizada !");
+            }
+
+
+            //letrasUtilizadas += "" + letra;
+
 
             boolean perdeVida = true;
 
@@ -122,6 +135,15 @@ public class TesteForca2 {
 
     public static String[] getDicas() {
         return dicas;
+    }
+
+
+    public boolean isGameStart() {
+        return gameStart;
+    }
+
+    public void setGameStart(boolean gameStart) {
+        this.gameStart = gameStart;
     }
 
 
