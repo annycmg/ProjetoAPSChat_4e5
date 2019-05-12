@@ -4,6 +4,23 @@ import java.util.Scanner;
 public class TesteForca2 {
 
 
+    // dicas
+
+    public static String[] dicas = {"COMERCIALIZAÇÃO INTERNACIONAL INDEVIDA DE RECURSOS BIOLÓGICOS.", //dica: BIOPIRATARIA
+            "COMPONENTES QUE SE DESINTEGRAM SEM RESULTADOS NEGATIVOS.", //dica: BIODEGRADAVEL
+            "REAPROVEITAMENTO DE MATERIA-PRIMA.", // dica: RECICLAGEM
+            "AÇÕES HUMANAS QUE VISAM SUPRIR NECESSIDADES ATUAIS DO SER HUMANO SEM COMPROMETER AS GERAÇÕES FUTURAS.", // dica: SUSTENTEBILIDADE
+            "CAMPO DE ESTUDO DAS RELAÇÕES DOS SERES VIVOS ENTRE SI E COM O MEIO EM QUE VIVEM.", // dica: ECOLOGIA
+            "PARTES QUE SOBRAM DE PROCESSOS DERIVADOS DE ATIVIDADE HUMANA E ANIMAL.", // dica: RESIDUO
+            "CONJUNTO DE TODAS AS ESPÉCIES DE SERES VIVOS EXISTENTES NA BIOSFERA.", // dica: BIODIVERSIDADE
+            "DEGRADAÇÃO DAS PROPRIEDADES FÍSICAS OU QUÍMICAS DO ECOSSISTEMAS.", // dica: POLUICAO
+            "BACIA QUE ABRANGE 7 MILHÕES DE QUILÔMETROS QUADRADOS, DOS QUAIS 5 MILHÕES E MEIO QUILÔMETROS QUADRADOS SÃO COBERTOS PELA FLORESTA TROPICAL."}; // dica: AMAZONIA
+
+
+    //dica = getNpalavra(); // dica dá um get no indice da palavra sorteada, isso une uma palavra com uma dica
+    //doc = "DICA: " + getDicas()[dica]; // traz a dica referente a palavra sorteada
+
+
     public static void metodoForca() {
 
 
@@ -23,6 +40,10 @@ public class TesteForca2 {
 
         //a variavel recebe um valor int randomizado do indice de uma das palavras
         int indiceSorteado = random.nextInt(quantPalavras);
+
+        int dica = indiceSorteado;
+
+        String dicaSorteada = "DICA : " + getDicas()[dica];
 
         //variavel recebe a palavra sorteada
         String sorteada = (palavras[indiceSorteado]); //palavras na posição indice sorteado
@@ -52,6 +73,7 @@ public class TesteForca2 {
             System.out.println("\n"
                     + "Você tem " + vidas + " vidas "
                     + "\nletras utilizadas: " + letrasUtilizadas
+                    + "\nDica da palavra : " + dicaSorteada
                     + "\nQual letra vc deseja tentar ? ");
             letra = in.next().toUpperCase().charAt(0);
             letrasUtilizadas += "" + letra;
@@ -96,8 +118,14 @@ public class TesteForca2 {
 
     }
 
+    public static String[] getDicas() {
+        return dicas;
+    }
+
 
     public static void main(String[] args) {
         metodoForca();
     }
 }
+
+
