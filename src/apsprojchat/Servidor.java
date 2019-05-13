@@ -31,6 +31,7 @@ public class Servidor extends Thread {
     private InputStream input;  
     private InputStreamReader inReader;  
     private BufferedReader bfr;
+    private TesteForca2 testeForca2;
 
     // DEBUG O APP:
     // Debug Servidor primeiro e então debug Cliente depois quantas vezes quiser para ser multithread.
@@ -53,6 +54,7 @@ public class Servidor extends Thread {
             input  = con.getInputStream();
             inReader = new InputStreamReader(input);
             bfr = new BufferedReader(inReader);
+            testeForca2 = new TesteForca2();
         } catch (IOException e) {
             e.printStackTrace();
         }                          
@@ -61,13 +63,15 @@ public class Servidor extends Thread {
     public void run(){ // verifica se há alguma mensagem nova
         String msg = "";
         BufferedWriter bfw = null;
+        ClienteAtivos cliente = null;
         try{
             OutputStream ou =  this.conexao.getOutputStream();
             Writer ouw = new OutputStreamWriter(ou);
             bfw = new BufferedWriter(ouw);
             nome = bfr.readLine(); 
             System.out.println(nome+" entrou!");
-            clientes.add(new ClienteAtivos(nome, bfw));
+            cliente = new ClienteAtivos(nome, bfw);
+            clientes.add(cliente);
             sendToAll(bfw,"Usuario: "+nome+" se conectou no chat");
             sendToAll(bfw,"use !start para iniciar o game");
                   
@@ -75,14 +79,28 @@ public class Servidor extends Thread {
             {           
                 msg = bfr.readLine();
                 if(msg.contains("!start")){
-                    if(TesteForca2.gameStart){
+                    if(testeForca2.gameStart){
                         sendToAlls("Jogo já foi iniciado!\r\n");
                     }else{
-                        TesteForca2.gameStart = true;
+                        testeForca2.gameStart = true;
                         sendToAlls("Jogo foi iniciado!");
-                        sendToAlls(TesteForca2.metodoForcaStart());
+                        sendToAlls(testeForca2.metodoForcaStart());
                     }
-                }else {
+                }
+                else if(msg.substring(0,1).contains("!")){
+                    if(testeForca2.gameStart != false) {
+                        if (msg.length() == 2) {
+                            String letra = testeForca2.InsereLetra(msg.charAt(1));
+                            if(letra.contains("Parabens você conseguiu")){
+                                sendToAlls("Parabens o jogador: "+cliente.getNome() +" ganhou!!");
+                                testeForca2.gameStart = false;
+                            }else{
+                                sendToClient(letra, bfw);
+                            }
+                        }
+                    }
+                }
+                else {
                     sendToAll(bfw, msg);
                     //System.out.println(msg);
                 }
@@ -101,6 +119,14 @@ public class Servidor extends Thread {
     }
     public void sendConsole(String message){
         System.out.println(message);
+    }
+    public void sendToClient(String msg,BufferedWriter bfw){
+        try{
+            bfw.write(msg+"\r\n");
+            bfw.flush();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
     public void sendToAlls(String msg){
         for(ClienteAtivos ca : clientes){
