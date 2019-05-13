@@ -55,19 +55,21 @@ public class TesteForca2 {
     public static String metodoForcaStart(){
         IndiceSorteado();
         sorteada = palavras[numSorteado];
+        String aux = "";
         char[] acertos = new char[sorteada.length()];
         for (int i = 0; i < acertos.length; i++) {
             acertos[i] = 0;
         }
         letrasUtilizadas = "";
         for (int i = 0; i < sorteada.length(); i++) {
-            System.out.print("_ ");
+            aux += "_ ";
         }
          return ("\n"
                 //+ "Você tem " + vidas + " vidas "
                 //+ "\nletras utilizadas: " + letrasUtilizadas
+                 +"\n"+aux
                 + "\nDica da palavra : " + getDica()
-                + "\nQual letra vc deseja tentar ? ");
+                + "\nQual letra vc deseja tentar ? Para digita a letra utilize !x 'x' sendo a letra desejada.");
     }
 
     public static void metodoForca() {
