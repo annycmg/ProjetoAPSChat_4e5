@@ -45,7 +45,7 @@ private JButton btSair;
 private JLabel lblHistorico;
 private JLabel lblMensagem;
 private JPanel pnlConteudo;
-// variaveis do cliente
+// variaveis da conexão cliente
 private Socket socket;
 private OutputStream out;
 private Writer writer; 
@@ -55,7 +55,7 @@ private JTextField txtPorta;
 private JTextField txtNome;
 
     public Cliente(){
-        // Interface conexão do cliente
+        // Interface conexão do cliente JOptionPane
         try {
             JLabel lblMessage = new JLabel("Verificar!");
             txtIP = new JTextField("0.0.0.0"); // <--- IP padrão
@@ -63,14 +63,14 @@ private JTextField txtNome;
             txtNome = new JTextField("Cliente-Servidor"); // <--- nickname padrão
             Object[] texts = {lblMessage, txtIP, txtPorta, txtNome};
             JOptionPane.showMessageDialog(null, texts);
+            
+            // Interface do chat
             pnlConteudo = new JPanel();
-
-            // Textos do chat
-            texto = new JTextPane(); // LARGURA/ALTURA txtArea Históric
+            texto = new JTextPane(); // LARGURA/ALTURA txtPane Histórico
             texto.setPreferredSize(new Dimension(600,545));
             texto.setEditable(false);
-            doc = texto.getStyledDocument();
-            esq = new SimpleAttributeSet();
+            doc = texto.getStyledDocument(); // Texts do jogo da forca
+            esq = new SimpleAttributeSet(); 
             StyleConstants.setAlignment(esq, StyleConstants.ALIGN_LEFT);
             StyleConstants.setForeground(esq, Color.BLACK);
             dir = new SimpleAttributeSet();
@@ -114,6 +114,7 @@ private JTextField txtNome;
             setTitle(txtNome.getText());
             setContentPane(pnlConteudo);
             setLocationRelativeTo(null);
+            setLocation(700,5);
             setResizable(false);
             setSize(680, 700); // largura/altura janela principal
             setVisible(true);
@@ -124,37 +125,50 @@ private JTextField txtNome;
         }
     }
     
-    public void conectar() throws IOException{ // conexão do cliente com o socket servidor
+    /***
+    * Método usado para conectar no server socket, retorna IO Exception caso haja algum erro.
+    * @throws IOException
+    */
+    public void conectar() throws IOException{  // conexão do cliente com o socket servidor
         socket = new Socket(txtIP.getText(),Integer.parseInt(txtPorta.getText())); // Socktet recebe os parametros de IP e Porta
-        out = socket.getOutputStream();
-        writer = new OutputStreamWriter(out);
+        out = socket.getOutputStream();         //Streams de 
+        writer = new OutputStreamWriter(out);   //comunicaçõ
         bfwriter = new BufferedWriter(writer);
         bfwriter.write(txtNome.getText()+"\r\n");
         bfwriter.flush();
     }
     
-    public void enviarMensagem(String msg) throws IOException, BadLocationException { // envio de msg do cliente para o socket servidor
+    /***
+    * Método para enviar mensagem para o server socket
+    * @param String
+    * @throws IOException retorna IO Exception caso haja algum erro.
+    */
+    public void enviarMensagem(String msg) throws IOException, BadLocationException { 
         if(msg.equals("Sair")){
-            bfwriter.write("Desconectado \r\n"); // <--- Caso clique no evento Sair
+            bfwriter.write("Desconectado \r\n"); 
             doc.setParagraphAttributes(doc.getLength(),1,dir,false);
-            doc.insertString(doc.getLength(), "Desconectado \r\n", dir);
+            doc.insertString(doc.getLength(), "Desconectado \r\n", dir); // Se o cliente logado digitar Sair no chat
             //doc.setParagraphAttributes(doc.getLength(),1,esq,false);
             //texto.append("Desconectado \r\n");
         }else{
-            bfwriter.write(msg+"\r\n");
+            bfwriter.write(msg+"\r\n"); 
 //            texto.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 //            texto.append( txtNome.getText() + " disse ->  " + mensagem.getText()+"\r\n");
-            doc.setParagraphAttributes(doc.getLength(),1,dir,false);
+            doc.setParagraphAttributes(doc.getLength(),1,dir,false); // Se não a estrutura [Nome] + "disse ->" + mensage aparecerá
             doc.insertString(doc.getLength(), txtNome.getText() + " disse ->  " + mensagem.getText()+" " + "\r\n", dir);
 
         }
-        bfwriter.flush();
+        bfwriter.flush(); // obriga a descarregar todo o conteúdo da msg
         mensagem.setText("");        
     }
     
-    public void escutar() throws IOException,BadLocationException{ // recebe msg do servidor
-        InputStream in = socket.getInputStream();
-        InputStreamReader inr = new InputStreamReader(in);
+    /**
+    * Método para receber mensagem do servidor
+    * @throws IOException retorna IO Exception caso haja algum erro.
+    */
+    public void escutar() throws IOException,BadLocationException{ // Toda vez que é feito o input de uma mensagem 
+        InputStream in = socket.getInputStream();                  // esse método é processado pelo servidor e envia
+        InputStreamReader inr = new InputStreamReader(in);         // para todos os clientes conectados
         BufferedReader bfr = new BufferedReader(inr);
         String msg = "";
         String[] aux = null;
@@ -202,7 +216,7 @@ private JTextField txtNome;
         }                       
     }
     
-    public void keyPressed(KeyEvent e) { // Opção press ENTER            
+    public void keyPressed(KeyEvent e) { // press ENTER para enviar mensagem           
         if(e.getKeyCode() == KeyEvent.VK_ENTER){
             try {
                 enviarMensagem(mensagem.getText());

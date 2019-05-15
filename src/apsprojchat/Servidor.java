@@ -36,31 +36,31 @@ public class Servidor extends Thread {
     // DEBUG O APP:
     // Debug Servidor primeiro e então debug Cliente depois quantas vezes quiser para ser multithread.
     // Para a aplicação rodar todos os usuários têm que ter o MESMO NÚMERO de IP e PORTA,
-    // caso contrário a conexão não é sucedida.
+    // caso contrário a conexão não é executada.
     //===============================================================================================
     // Requisito de S.O: Comando NETSTAT --->  Abrir prompt de comando e digitar: [netstat -a]
     // Aparecerá o número de IP e de porta usado na aplicação com conexão status ESTABILISHED
     //=======================================================================================
     // Passos para um chat via TCP/IP:
-    // Step 1: In any Client/Server Application, we need to run the server before the client, because the server keeps waiting for the client to be connected.
-    // Step 2: Server keeps listening for the client on an assigned IP & Port
-    // Step 3: For establishing connection client must know the IP & Port of the server.
-    // Step 4: When we start Client Application, It creates a connection to the server.
-    // Step 5: After the Successful connection Client & Server Applications can send & receive messages.
+    // Passo 1: é preciso rodar o servidor antes do cliente, pois o servidor fica esperando o cliente ser conectado.
+    // Passo 2: o servidor escuta o cliente através da declaração de IP e Porta.
+    // Passo 3: para estabelecer uma conexão, o cliente precisa saber a Porta do Servidor.
+    // Passo 4: quando a aplicação do cliente é iniciada, é criada uma conexão com o servidor.  
+    // Passo 5: Depois que a conexão é bem sucedida o cliente eo servidor podem enviar e receber mensagens.
  
     public Servidor(Socket con){ // conexão do Servidor com o Cliente
         this.conexao = con;
         try {
             input  = con.getInputStream();
-            inReader = new InputStreamReader(input);
-            bfr = new BufferedReader(inReader);
-            testeForca2 = new TesteForca2();
+            inReader = new InputStreamReader(input); //objeto do tipo BufferedReader, 
+            bfr = new BufferedReader(inReader);      //que aponta para o stream do cliente socket
+            testeForca2 = new TesteForca2();         //e se conecta com a classe testeforca2
         } catch (IOException e) {
             e.printStackTrace();
         }                          
     }
 
-    public void run(){ // verifica se há alguma mensagem nova
+    public void run(){ // verifica se há alguma mensagem/conexão nova
         String msg = "";
         BufferedWriter bfw = null;
         ClienteAtivos cliente = null;
@@ -72,10 +72,10 @@ public class Servidor extends Thread {
             System.out.println(nome+" entrou!");
             cliente = new ClienteAtivos(nome, bfw);
             clientes.add(cliente);
-            sendToAll(bfw,"Usuario: "+nome+" se conectou no chat");
+            sendToAll(bfw,"Usuario: "+nome+" se conectou no chat"); // Quando um novo cliente se conectar 
             sendToAll(bfw,"use !start para iniciar o game");
                   
-            while(!"Sair".equalsIgnoreCase(msg) && msg != null)
+            while(!"Sair".equalsIgnoreCase(msg) && msg != null) // Se mensagem = !Sair e !=null --> Chat/Jogo continua ativo
             {           
                 msg = bfr.readLine();
                 if(msg.contains("!start")){
@@ -107,7 +107,7 @@ public class Servidor extends Thread {
             }
         }catch (Exception e) {
             if(e.getMessage().equals("Connection reset")){
-                System.out.println("Usuario "+nome+" saiu!");
+                System.out.println("Usuario "+nome+" saiu!"); // Se o cliente digitar ou clicar 'Sair'
                 try {
                     sendToAllExit( "Usuario "+nome+" saiu!");
                 }catch (Exception ex){
