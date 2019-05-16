@@ -2,7 +2,10 @@
 package apsprojchat;
 
 /**
+ *
  * @author Anny
+ * 
+ * 
  */
    
 import java.io.BufferedReader;
@@ -57,7 +60,7 @@ public class Servidor extends Thread {
         }                          
     }
 
-    public void run(){ // verifica se há alguma conexão nova
+    public void run(){ // verifica se há alguma mensagem/conexão nova
         String msg = "";
         BufferedWriter bfw = null;
         ClienteAtivos cliente = null;
