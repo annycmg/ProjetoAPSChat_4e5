@@ -72,6 +72,7 @@ public class Servidor extends Thread {
             System.out.println(nome+" entrou!");
             cliente = new ClienteAtivos(nome, bfw);
             clientes.add(cliente);
+            testeForca2.jogadores.add(nome);
             sendToAll(bfw,"Usuario: "+nome+" se conectou no chat"); // Quando um novo cliente se conectar 
             sendToAll(bfw,"use !start para iniciar o game");
                   
@@ -84,20 +85,33 @@ public class Servidor extends Thread {
                     }else{
                         testeForca2.gameStart = true;
                         sendToAlls("Jogo foi iniciado!");
-                        sendToAlls(testeForca2.metodoForcaStart());
+                        sendToAlls(testeForca2.metodoForcaStart()+"Você tem " + testeForca2.vidas.get(nome) + " vidas \n");
                     }
+                }else if(msg.contains("!restart")){
+                    for(ClienteAtivos ca : clientes){
+                        ca.limpaletrasUtilizadas();
+                    }
+                    sendToAlls("Jogo foi Reiniciado!");
+                    sendToAlls(testeForca2.metodoForcaStart()+"Você tem " + testeForca2.vidas.get(nome) + " vidas \n");
                 }
-                else if(msg.substring(0,1).contains("!")){
+                else if( msg.length() > 1 && msg.substring(0,1).contains("!")){
                     if(testeForca2.gameStart != false) {
                         if (msg.length() == 2) {
-                            String letra = testeForca2.InsereLetra(msg.charAt(1));
+                            char let = msg.charAt(1);
+                            String letra = testeForca2.InsereLetra(let,cliente);
                             if(letra.contains("Parabens você conseguiu")){
                                 sendToAlls("Parabens o jogador: "+cliente.getNome() +" ganhou!!");
                                 testeForca2.gameStart = false;
-                            }else{
-                                sendToClient(letra, bfw);
+                            }else if(letra.contains("Você perdeu!")){
+                                sendToAlls("O jogador: "+cliente.getNome()+" perdeu!");
+                            }
+                            else{
+                                sendToAll(bfw,"Jogou > "+letra);
+                                sendToClient(letra,bfw);
                             }
                         }
+                    }else{
+                        sendToClient("Jogo não foi iniciado",bfw);
                     }
                 }
                 else {

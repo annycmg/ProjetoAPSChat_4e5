@@ -1,8 +1,7 @@
 package apsprojchat;
 
 import java.nio.charset.CharsetEncoder;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class TesteForca2 {
 
@@ -29,6 +28,8 @@ public class TesteForca2 {
             "RESIDUO", "BIODIVERSIDADE", "POLUICAO", "AMAZONIA"};
 
     private static int numSorteado;
+    public static HashMap<String, Integer> vidas;
+    public static HashMap<String, String> letrasUt;
 
     public void IndiceSorteado() {
         numSorteado = new Random().nextInt(palavras.length);
@@ -63,7 +64,18 @@ public class TesteForca2 {
     public  String metodoForcaStart() {
 
         IndiceSorteado();
+        vidas = new HashMap<>();
+        letrasUt = new HashMap<>();
+
         sorteada = palavras[numSorteado];
+        for(String item : jogadores){
+            letrasUt.put(item, "");
+            if (sorteada.length() >= 8) {
+                vidas.put(item, 5);
+            } else {
+                vidas.put(item, 3);
+            }
+        }
         String aux = "";
         acertos = new char[sorteada.length()];
 
@@ -82,12 +94,14 @@ public class TesteForca2 {
                 + "\nQual letra vc deseja tentar ? Para digita a letra utilize !x 'x' sendo a letra desejada.");
     }
 
-    public String InsereLetra(char letra) {
+    public String InsereLetra(char letra,ClienteAtivos ca) {
         try {
 
 
             String aux = "";
+            boolean perdervida = true;
             letra = Character.toUpperCase(letra);
+            ca.addletrasUtilizadas(letra);
             for (int i = 0; i < sorteada.length(); i++) {
                 // verifica se a letra digitada
                 // é igual a letra da palavra sorteada
@@ -96,8 +110,11 @@ public class TesteForca2 {
                 if (letra == sorteada.charAt(i)) {
                     //System.out.println("TEM ESSA LETRA na posicao" + i);
                     acertos[i] = 1;
+                    perdervida = false;
                 }
             }
+            if(perdervida)
+                vidas.put(ca.getNome(),vidas.get(ca.getNome())-1);
 
             for (int i = 0; i < sorteada.length(); i++) { //esse for faz com que pegue o tamanho da palabra sorteada e incremente
                 if (acertos[i] == 0) {
@@ -111,6 +128,11 @@ public class TesteForca2 {
             }
             if(aux.replace(" ","").equals(sorteada)){
                 aux = "Parabens você conseguiu acertar a palavra!";
+            }else if(vidas.get(ca.getNome())<1){
+                aux = "\nVocê perdeu!";
+            }
+            else{
+                aux = "\n"+ca.getNome()+ " tem " + vidas.get(ca.getNome()) + " vidas \nletras utilizadas: "+ca.getLetrasUtilizadas()+"\n"+aux;
             }
             return aux;
         }catch (Exception e){
