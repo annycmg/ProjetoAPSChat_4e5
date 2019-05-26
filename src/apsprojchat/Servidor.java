@@ -2,10 +2,7 @@
 package apsprojchat;
 
 /**
- *
- * @author Anny
- * 
- * 
+ * @author Anny 
  */
    
 import java.io.BufferedReader;
@@ -24,16 +21,48 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 public class Servidor extends Thread {
+    
+    public static void main(String[] args) {
+        try{
+            //Tela inicial 
+            if (JOptionPane.showConfirmDialog(null, "\n\n\n        Vamos iniciar o Chat do Jogo da Forca?                 \n\n\n\n",
+                    "Chat do Jogo da Forca", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                // yes option
+            }else {
+                System.exit(0);
+            }
+            //Criação dos objetos para instanciar/iniciar o servidor
+            JLabel lblMessage = new JLabel("\n\n\n         Porta do Servidor:");
+            JTextField txtPorta = new JTextField("5151"); // nº de porta padrão
+            Object[] texts = {lblMessage, txtPorta };  
+            JOptionPane.showMessageDialog(null, texts);
+            server = new ServerSocket(Integer.parseInt(txtPorta.getText()));
+            clientes = new ArrayList<ClienteAtivos>();
+            JOptionPane.showMessageDialog(null,"\n\n\n          Servidor foi ativado na porta: "+         
+            txtPorta.getText() + "                 \n\n\n");
+    
+            while(true){
+                System.out.println("Aguardando nova conexão..."); // Console
+                Socket con = server.accept();
+                System.out.println("Novo cliente conectado..."); // Console
+                Thread thread = new Servidor(con);
+                thread.start();   
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        } 
+    }
+    
     private static ArrayList<ClienteAtivos>clientes; // variavel arraylist, que comporta um ou vários usuários (multithread)        
+    private TesteForca2 testeForca2;
     private static ServerSocket server; 
-    private String nome;
+    private BufferedReader bfr;
+    private String jogador;
+    private InputStreamReader inReader;  
     private Socket conexao;
     private InputStream input;  
-    private InputStreamReader inReader;  
-    private BufferedReader bfr;
-    private TesteForca2 testeForca2;
 
-    // DEBUG O APP:
+    // DEBUG the APP:
     // Debug Servidor primeiro e então debug Cliente depois quantas vezes quiser para ser multithread.
     // Para a aplicação rodar todos os usuários têm que ter o MESMO NÚMERO de IP e PORTA,
     // caso contrário a conexão não é executada.
@@ -47,8 +76,83 @@ public class Servidor extends Thread {
     // Passo 3: para estabelecer uma conexão, o cliente precisa saber a Porta do Servidor.
     // Passo 4: quando a aplicação do cliente é iniciada, é criada uma conexão com o servidor.  
     // Passo 5: Depois que a conexão é bem sucedida o cliente eo servidor podem enviar e receber mensagens.
- 
-    public Servidor(Socket con){ // conexão do Servidor com o Cliente
+
+    public void run(){ // verifica se há alguma mensagem/conexão nova
+        String message = "";
+        ClienteAtivos cliente = null;
+        BufferedWriter bfw = null;
+        try{
+            OutputStream ou =  this.conexao.getOutputStream();
+            Writer ouw = new OutputStreamWriter(ou);
+            bfw = new BufferedWriter(ouw);
+            
+            jogador = bfr.readLine(); 
+            System.out.println(jogador+" entrou!");
+            
+            cliente = new ClienteAtivos(jogador, bfw);
+            clientes.add(cliente);
+            testeForca2.jogadores.add(jogador);
+            enviarParaTodos(bfw,"Usuario: "+jogador+" se conectou no chat"); // Quando um novo cliente se conectar 
+            enviarParaTodos(bfw,"use !start para iniciar o game");
+                  
+            while(!"Sair".equalsIgnoreCase(message) && message != null) // Se mensagem = !Sair e !=null --> Chat/Jogo continua ativo
+            {           
+                message = bfr.readLine();
+                if(message.contains("!start")){
+                    if(testeForca2.gameStart){
+                        enviarTodos("Jogo já foi iniciado!\r\n");
+                    }else{
+                        testeForca2.gameStart = true;
+                        enviarTodos("Jogo foi iniciado!");
+                        enviarTodos(testeForca2.metodoForcaStart()+"Você tem " + testeForca2.vidas.get(jogador) + " vidas \n");
+                    }
+                }else if(message.contains("!restart")){
+                    for(ClienteAtivos ca : clientes){
+                        ca.limpaletrasUtilizadas();
+                    }
+                    enviarTodos("Jogo foi Reiniciado!");
+                    enviarTodos(testeForca2.metodoForcaStart()+"Você tem " + testeForca2.vidas.get(jogador) + " vidas \n");
+                }
+                else if( message.length() > 1 && message.substring(0,1).contains("!")){
+                    if(testeForca2.gameStart != false) {
+                        if (message.length() == 2) {
+                            char let = message.charAt(1);
+                            String letra = testeForca2.InsereLetra(let,cliente);
+                            if(letra.contains("Parabens você conseguiu")){
+                                enviarTodos("Parabens o jogador: "+cliente.getNome() +" ganhou!!");
+                                testeForca2.gameStart = false;
+                            }else if(letra.contains("Você perdeu!")){
+                                enviarTodos("O jogador: "+cliente.getNome()+" perdeu!");
+                            }
+                            else{
+                                enviarParaTodos(bfw,"Jogou > "+letra);
+                                enviarOutros(letra,bfw);
+                            }
+                        }
+                    }else{
+                        enviarOutros("Jogo não foi iniciado",bfw);
+                    }
+                }
+                else {
+                    enviarParaTodos(bfw, message);
+                    //System.out.println(msg);
+                }
+            }
+        }catch (Exception e) {
+            if(e.getMessage().equals("Connection reset")){
+                System.out.println("Usuario "+jogador+" saiu!"); // Se o cliente digitar ou clicar 'Sair'
+                try {
+                    sendToAllExit( "Usuario "+jogador+" saiu!");
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            }else
+            e.printStackTrace();
+        }                       
+    }
+    public void Enviar(String message){System.out.println(message);}
+    
+     public Servidor(Socket con){ // conexão do Servidor com o Cliente
         this.conexao = con;
         try {
             input  = con.getInputStream();
@@ -59,90 +163,16 @@ public class Servidor extends Thread {
             e.printStackTrace();
         }                          
     }
-
-    public void run(){ // verifica se há alguma mensagem/conexão nova
-        String msg = "";
-        BufferedWriter bfw = null;
-        ClienteAtivos cliente = null;
+    
+    public void enviarOutros(String message,BufferedWriter bfw){
         try{
-            OutputStream ou =  this.conexao.getOutputStream();
-            Writer ouw = new OutputStreamWriter(ou);
-            bfw = new BufferedWriter(ouw);
-            nome = bfr.readLine(); 
-            System.out.println(nome+" entrou!");
-            cliente = new ClienteAtivos(nome, bfw);
-            clientes.add(cliente);
-            testeForca2.jogadores.add(nome);
-            sendToAll(bfw,"Usuario: "+nome+" se conectou no chat"); // Quando um novo cliente se conectar 
-            sendToAll(bfw,"use !start para iniciar o game");
-                  
-            while(!"Sair".equalsIgnoreCase(msg) && msg != null) // Se mensagem = !Sair e !=null --> Chat/Jogo continua ativo
-            {           
-                msg = bfr.readLine();
-                if(msg.contains("!start")){
-                    if(testeForca2.gameStart){
-                        sendToAlls("Jogo já foi iniciado!\r\n");
-                    }else{
-                        testeForca2.gameStart = true;
-                        sendToAlls("Jogo foi iniciado!");
-                        sendToAlls(testeForca2.metodoForcaStart()+"Você tem " + testeForca2.vidas.get(nome) + " vidas \n");
-                    }
-                }else if(msg.contains("!restart")){
-                    for(ClienteAtivos ca : clientes){
-                        ca.limpaletrasUtilizadas();
-                    }
-                    sendToAlls("Jogo foi Reiniciado!");
-                    sendToAlls(testeForca2.metodoForcaStart()+"Você tem " + testeForca2.vidas.get(nome) + " vidas \n");
-                }
-                else if( msg.length() > 1 && msg.substring(0,1).contains("!")){
-                    if(testeForca2.gameStart != false) {
-                        if (msg.length() == 2) {
-                            char let = msg.charAt(1);
-                            String letra = testeForca2.InsereLetra(let,cliente);
-                            if(letra.contains("Parabens você conseguiu")){
-                                sendToAlls("Parabens o jogador: "+cliente.getNome() +" ganhou!!");
-                                testeForca2.gameStart = false;
-                            }else if(letra.contains("Você perdeu!")){
-                                sendToAlls("O jogador: "+cliente.getNome()+" perdeu!");
-                            }
-                            else{
-                                sendToAll(bfw,"Jogou > "+letra);
-                                sendToClient(letra,bfw);
-                            }
-                        }
-                    }else{
-                        sendToClient("Jogo não foi iniciado",bfw);
-                    }
-                }
-                else {
-                    sendToAll(bfw, msg);
-                    //System.out.println(msg);
-                }
-            }
-        }catch (Exception e) {
-            if(e.getMessage().equals("Connection reset")){
-                System.out.println("Usuario "+nome+" saiu!"); // Se o cliente digitar ou clicar 'Sair'
-                try {
-                    sendToAllExit( "Usuario "+nome+" saiu!");
-                }catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }else
-            e.printStackTrace();
-        }                       
-    }
-    public void sendConsole(String message){
-        System.out.println(message);
-    }
-    public void sendToClient(String msg,BufferedWriter bfw){
-        try{
-            bfw.write(msg+"\r\n");
+            bfw.write(message+"\r\n");
             bfw.flush();
         }catch (Exception e){
             e.printStackTrace();
         }
     }
-    public void sendToAlls(String msg){
+    public void enviarTodos(String msg){
         for(ClienteAtivos ca : clientes){
             try{
                 ca.getBfw().write(msg+"\r\n");
@@ -167,48 +197,19 @@ public class Servidor extends Thread {
         if(removeCA != null)
             clientes.remove(removeCA);
     }
-    public void sendToAll(BufferedWriter bwSaida, String msg) throws  IOException 
+    
+    public void enviarParaTodos(BufferedWriter bwSaida, String msg) throws  IOException 
     { // quando uma msg é enviada por um cliente, ela é replicada para todos os outros da Thread
         BufferedWriter bwS;
         for(ClienteAtivos ca : clientes){
             bwS = ca.getBfw();
 
             if(!(bwSaida == bwS)){
-                ca.getBfw().write(nome + " disse -> " + msg+"\r\n");
+                ca.getBfw().write(jogador + " disse -> " + msg+"\r\n");
                 ca.getBfw().flush(); 
             }else
-                sendConsole(nome + " disse -> " + msg);
+                Enviar(jogador + " disse -> " + msg);
         }          
     }
     
-    public static void main(String[] args) {
-        try{
-            //Tela inicial 
-            if (JOptionPane.showConfirmDialog(null, "\n\n\n        Vamos iniciar o Chat do Jogo da Forca?                 \n\n\n\n",
-                    "Chat do Jogo da Forca", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                // yes option
-            }else {
-                System.exit(0);
-            }
-            //Criação dos objetos para instanciar/iniciar o servidor
-            JLabel lblMessage = new JLabel("Porta do Servidor:");
-            JTextField txtPorta = new JTextField("5151"); // nº de porta padrão
-            Object[] texts = {lblMessage, txtPorta };  
-            JOptionPane.showMessageDialog(null, texts);
-            server = new ServerSocket(Integer.parseInt(txtPorta.getText()));
-            clientes = new ArrayList<ClienteAtivos>();
-            JOptionPane.showMessageDialog(null,"Servidor ativo na porta: "+         
-            txtPorta.getText());
-    
-            while(true){
-                System.out.println("Aguardando conexão..."); // Console
-                Socket con = server.accept();
-                System.out.println("Cliente conectado..."); // Console
-                Thread thread = new Servidor(con);
-                thread.start();   
-            }
-        }catch (Exception e) {
-            e.printStackTrace();
-        } 
-    }
 }

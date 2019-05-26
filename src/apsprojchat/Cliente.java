@@ -31,6 +31,16 @@ import javax.swing.JTextPane;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
 public class Cliente extends JFrame implements ActionListener, KeyListener{
+     public static void main(String []args) throws IOException{
+        try {
+            Cliente app = new Cliente();
+            app.connect();
+            app.listen();
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(null,e.getMessage());
+        }
+    }
+    
 private static final long serialVersionUID = 1L;
 // variaveis do chat
 private JTextPane texto;
@@ -39,134 +49,115 @@ private SimpleAttributeSet dir;
 private SimpleAttributeSet cen;
 private StyledDocument doc;
 // variaveis da interface
+private JButton Sair;
 private JTextField mensagem;
-private JButton btEnviar;
-private JButton btSair;
-private JLabel lblHistorico;
-private JLabel lblMensagem;
-private JPanel pnlConteudo;
+private JButton Enviar;
+private JLabel Jogo;
+private JLabel Mensagem;
+private JPanel Painel;
 // variaveis da conexão cliente
-private Socket socket;
 private OutputStream out;
-private Writer writer; 
 private BufferedWriter bfwriter;
-private JTextField txtIP;
-private JTextField txtPorta;
-private JTextField txtNome;
+private JTextField IP;
+private Writer writer; 
+private JTextField Porta;
+private Socket socket;
+private JTextField Nome;
+
 
     public Cliente(){
-        // Interface conexão do cliente JOptionPane
         try {
-            JLabel lblMessage = new JLabel("Verificar!");
-            txtIP = new JTextField("0.0.0.0"); // <--- IP padrão
-            txtPorta = new JTextField("5151"); // <--- porta padrão
-            txtNome = new JTextField("Cliente-Servidor"); // <--- nickname padrão
-            Object[] texts = {lblMessage, txtIP, txtPorta, txtNome};
-            JOptionPane.showMessageDialog(null, texts);
-            
             // Interface do chat
-            pnlConteudo = new JPanel();
-            texto = new JTextPane(); // LARGURA/ALTURA txtPane Histórico
+            Painel = new JPanel();
+            texto = new JTextPane(); // LARGURA/ALTURA txtPane do Jogo
             texto.setPreferredSize(new Dimension(600,545));
             texto.setEditable(false);
             doc = texto.getStyledDocument(); // Texts do jogo da forca
-            esq = new SimpleAttributeSet(); 
+            esq = new SimpleAttributeSet();  // Texts à esquerda
             StyleConstants.setAlignment(esq, StyleConstants.ALIGN_LEFT);
             StyleConstants.setForeground(esq, Color.BLACK);
-            dir = new SimpleAttributeSet();
+            dir = new SimpleAttributeSet();  // Texts à direita
             StyleConstants.setAlignment(dir, StyleConstants.ALIGN_RIGHT);
             StyleConstants.setForeground(dir, Color.blue);
-            cen = new SimpleAttributeSet();
+            cen = new SimpleAttributeSet();  // Texts ao centro
             StyleConstants.setAlignment(cen,StyleConstants.ALIGN_CENTER);
             StyleConstants.setForeground(cen,Color.red);
-//            texto.setFont(new Font("Dialog", Font.BOLD, 14)); // Tamanho da fonte na txtArea
-//            texto.setEditable(false);
-//            texto.setBackground(new Color(240, 240, 240));
             doc.setParagraphAttributes(doc.getLength(),1,cen,false);
             doc.insertString(doc.getLength(), "BEM VINDO AO JOGO DA FORCA!!! \r\n", cen);
-//          doc.insertString(doc.getLength(), "Escolha uma letra ou Adivinhe a palavra? \r\n" , cen);
             Style style = doc.getStyle(StyleContext.DEFAULT_STYLE);
-            StyleConstants.setFontSize(style, 17);
+            StyleConstants.setFontSize(style, 19);
+            
+            // Interface conexão do cliente JOptionPane
+            JLabel lblMessage = new JLabel("\n\n\n           Entre com NickName, IP e Porta                  \n\n\n");
+            Nome = new JTextField("NickName"); // <--- nickname padrão
+            IP = new JTextField("0.0.0.0"); // <--- IP padrão
+            Porta = new JTextField("5151"); // <--- porta padrão
+            Object[] texts = {lblMessage, Nome, IP, Porta};
+            JOptionPane.showMessageDialog(null, texts);
             
             //Componentes da interface do chat
-            mensagem = new JTextField(53); // largura txtField Mensagem
-            mensagem.setFont(new Font("Dialog", Font.BOLD, 14)); // Tamanho da fonte no txtField
-            lblHistorico = new JLabel("HISTÓRICO");           
-            lblMensagem = new JLabel("MENSAGEM");
-            btEnviar = new JButton("Enviar");
-            btEnviar.setToolTipText("Enviar Mensagem");
-            btSair = new JButton("Sair");
-            btSair.setToolTipText("Sair do Chat");
-            btEnviar.addActionListener(this);
-            btSair.addActionListener(this);
-            btEnviar.addKeyListener(this);
+            mensagem = new JTextField(43); // largura txtField Mensagem
+            mensagem.setFont(new Font("Dialog", Font.BOLD, 16)); // Tamanho da fonte no txtField
+            Jogo = new JLabel("JOGO DA FORCA");           
+            Mensagem = new JLabel("MENSAGEM");
+            Enviar = new JButton("Enviar");
+            Sair = new JButton("Sair");
+            Enviar.addActionListener(this);
+            Sair.addActionListener(this);
+            Enviar.addKeyListener(this);
             mensagem.addKeyListener(this);
             JScrollPane scroll = new JScrollPane(texto);
-            pnlConteudo.add(lblHistorico);
-            pnlConteudo.add(scroll);
-            pnlConteudo.add(lblMensagem);
-            pnlConteudo.add(mensagem);
-            pnlConteudo.add(btSair);
-            pnlConteudo.add(btEnviar);
-            pnlConteudo.setBackground(Color.LIGHT_GRAY);
-            texto.setBorder(BorderFactory.createLineBorder(Color.BLUE,3));
-            mensagem.setBorder(BorderFactory.createLineBorder(Color.BLUE,3));
-            setTitle(txtNome.getText());
-            setContentPane(pnlConteudo);
-            setLocationRelativeTo(null);
+            Painel.setBackground(new Color(179,220,184));
+            Painel.add(Jogo);
+            Painel.add(scroll);
+            Painel.add(Mensagem);
+            Painel.add(mensagem);
+            Painel.add(Enviar);
+            Painel.add(Sair);
+            setDefaultCloseOperation(EXIT_ON_CLOSE);
+            texto.setBorder(BorderFactory.createLineBorder(new Color(119,164,125),3));
+            mensagem.setBorder(BorderFactory.createLineBorder(new Color(119,164,125),3));
+            setTitle(Nome.getText());
+            setContentPane(Painel);
+            setSize(680, 700); // largura/altura janela principal
             setLocation(700,5);
             setResizable(false);
-            setSize(680, 700); // largura/altura janela principal
+            setLocationRelativeTo(null);
             setVisible(true);
-            setDefaultCloseOperation(EXIT_ON_CLOSE);
             // Interface
         }catch (Exception e){
             System.out.println(e.getStackTrace());
         }
     }
-    
-    /***
-    * Método usado para conectar no server socket, retorna IO Exception caso haja algum erro.
-    * @throws IOException
-    */
-    public void conectar() throws IOException{  // conexão do cliente com o socket servidor
-        socket = new Socket(txtIP.getText(),Integer.parseInt(txtPorta.getText())); // Socktet recebe os parametros de IP e Porta
+        
+    public void connect() throws IOException{  // conexão do cliente com o socket servidor
+        socket = new Socket(IP.getText(),Integer.parseInt(Porta.getText())); // Socktet recebe os parametros de IP e Porta
         out = socket.getOutputStream();         //Streams de 
         writer = new OutputStreamWriter(out);   //comunicaçõ
         bfwriter = new BufferedWriter(writer);
-        bfwriter.write(txtNome.getText()+"\r\n");
+        bfwriter.write(Nome.getText()+"\r\n");
         bfwriter.flush();
     }
     
-    /***
-    * Método para enviar mensagem para o server socket
-    * @param String
-    * @throws IOException retorna IO Exception caso haja algum erro.
-    */
+    //Enviar mensagem para o server socket
     public void enviarMensagem(String msg) throws IOException, BadLocationException { 
         if(msg.equals("Sair")){
             bfwriter.write("Desconectado \r\n"); 
             doc.setParagraphAttributes(doc.getLength(),1,dir,false);
             doc.insertString(doc.getLength(), "Desconectado \r\n", dir); // Se o cliente logado digitar Sair no chat
-            //doc.setParagraphAttributes(doc.getLength(),1,esq,false);
-            //texto.append("Desconectado \r\n");
+         
         }else{
             bfwriter.write(msg+"\r\n"); 
-//            texto.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-//            texto.append( txtNome.getText() + " disse ->  " + mensagem.getText()+"\r\n");
             doc.setParagraphAttributes(doc.getLength(),1,dir,false); // Se não a estrutura [Nome] + "disse ->" + mensage aparecerá
-            doc.insertString(doc.getLength(), txtNome.getText() + " disse ->  " + mensagem.getText()+" " + "\r\n", dir);
+            doc.insertString(doc.getLength(), Nome.getText() + " disse ->  " + mensagem.getText()+" " + "\r\n", dir);
 
         }
         bfwriter.flush(); // obriga a descarregar todo o conteúdo da msg
         mensagem.setText("");        
     }
     
-    /**
-    * Método para receber mensagem do servidor
-    * @throws IOException retorna IO Exception caso haja algum erro.
-    */
-    public void escutar() throws IOException,BadLocationException{ // Toda vez que é feito o input de uma mensagem 
+    // Receber mensagem do server
+    public void listen() throws IOException,BadLocationException{ // Toda vez que é feito o input de uma mensagem 
         InputStream in = socket.getInputStream();                  // esse método é processado pelo servidor e envia
         InputStreamReader inr = new InputStreamReader(in);         // para todos os clientes conectados
         BufferedReader bfr = new BufferedReader(inr);
@@ -178,11 +169,8 @@ private JTextField txtNome;
             if(msg.equals("Sair")) {
                 doc.setParagraphAttributes(doc.getLength(),1,esq,false);
                 doc.insertString(doc.getLength(), "Servidor caiu! \r\n", esq);
-
             }
             else{
-//                texto.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-//                texto.append(msg+"\r\n");
                 if(msg.contains("se conectou no chat")) {
                     aux = msg.split("Usuario:");
                     msg = aux[1];
@@ -198,22 +186,10 @@ private JTextField txtNome;
     
     public void sair() throws IOException,BadLocationException{ // desconctar o socket servidor
         enviarMensagem("Sair");
-        bfwriter.close();
         writer.close();
-        out.close();
+        bfwriter.close();
         socket.close();
-    }
-    
-    public void actionPerformed(ActionEvent e) { // Controle de eventos: Enviar e Sair        
-    try {
-        if(e.getActionCommand().equals(btEnviar.getActionCommand()))   
-            enviarMensagem(mensagem.getText());
-        else
-        if(e.getActionCommand().equals(btSair.getActionCommand()))
-            sair();
-        }catch (Exception e1) {
-            e1.printStackTrace();
-        }                       
+        out.close();
     }
     
     public void keyPressed(KeyEvent e) { // press ENTER para enviar mensagem           
@@ -225,20 +201,19 @@ private JTextField txtNome;
             }                                                          
         }                       
     }
-    
-    @Override
+
     public void keyReleased(KeyEvent arg0) {}
-    
-    @Override
     public void keyTyped(KeyEvent arg0) {}
     
-    public static void main(String []args) throws IOException{
-        try {
-            Cliente app = new Cliente();
-            app.conectar();
-            app.escutar();
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(null,e.getMessage());
-        }
+    public void actionPerformed(ActionEvent e) { // Controle de eventos: Enviar e Sair        
+    try {
+        if(e.getActionCommand().equals(Enviar.getActionCommand()))   
+            enviarMensagem(mensagem.getText());
+        else
+        if(e.getActionCommand().equals(Sair.getActionCommand()))
+            sair();
+        }catch (Exception e1) {
+            e1.printStackTrace();
+        }                       
     }
 }
